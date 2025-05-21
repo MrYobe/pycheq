@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="card-title mb-0">Process Payroll</h3>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <h5 class="alert-heading">Important Information</h5>
+                        <p>Processing payroll will:</p>
+                        <ul>
+                            <li>Generate payroll records for selected employees</li>
+                            <li>Calculate salaries and deductions based on current rates</li>
+                            <li>Create downloadable payslips</li>
+                        </ul>
+                        <p class="mb-0">Please ensure all employee information is up to date before proceeding.</p>
+                    </div>
+                    
+                    <div class="alert alert-warning">
+                        <h5 class="alert-heading"><i class="fas fa-exclamation-triangle me-2"></i>Recommendation</h5>
+                        <p>Before processing payroll, we recommend generating a verification report to review all employee data.</p>
+                        <a href="{{ url_for('payrun_verification') }}" class="btn btn-outline-warning">
+                            <i class="fas fa-file-alt me-2"></i>Generate Verification Report
+                        </a>
+                    </div>
+                    
+                    <form method="POST" action="{{ url_for('process_payroll') }}" class="mt-4">
+                        <!-- Employee Selection Section -->
+                        <div class="card mb-4">
+                            <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0">Select Employees for Payroll Processing</h5>
+                                <div>
+                                    <button type="button" class="btn btn-sm btn-outline-primary" id="selectAll">Select All</button>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary" id="deselectAll">Deselect All</button>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                {% if employees|length == 0 %}
+                                <div class="alert alert-warning">
+                                    <i class="fas fa-exclamation-circle me-2"></i>No active employees found.
+                                </div>
+                                {% else %}
+                                    {% for dept, dept_employees in employees_by_dept.items() %}
+                                    <div class="mb-4">
+                                        <h6 class="border-bottom pb-2 mb-3">{{ dept }} ({{ dept_employees|length }})</h6>
+                                        <div class="row">
+                                            {% for employee in dept_employees %}
+                                            <div class="col-md-4 mb-2">
+                                                <div class="form-check">
+                                                    <input class="form-check-input employee-checkbox" type="checkbox" name="selected_employees" value="{{ employee.id }}" id="employee{{ employee.id }}" checked>
+                                                    <label class="form-check-label" for="employee{{ employee.id }}">
+                                                        <strong>{{ employee.first_name }} {{ employee.last_name }}</strong>
+                                                        <small class="text-muted d-block">ID: {{ employee.employee_id or 'N/A' }}</small>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg" {% if employees|length == 0 %}disabled{% endif %}>
+                                <i class="fas fa-play-circle me-2"></i>Process Payroll for Selected Employees
+                            </button>
+                            <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Select all button
+        document.getElementById('selectAll').addEventListener('click', function() {
+            document.querySelectorAll('.employee-checkbox').forEach(function(checkbox) {
+                checkbox.checked = true;
+            });
+        });
+        
+        // Deselect all button
+        document.getElementById('deselectAll').addEventListener('click', function() {
+            document.querySelectorAll('.employee-checkbox').forEach(function(checkbox) {
+                checkbox.checked = false;
+            });
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col">
+            <h2><i class="fas fa-file-import"></i> Import Employees</h2>
+        </div>
+        <div class="col text-end">
+            <a href="{{ url_for('employees') }}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Back to Employees
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Upload Excel File</h5>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <h5><i class="fas fa-info-circle"></i> Instructions</h5>
+                        <ol>
+                            <li>Download the template Excel file using the button below</li>
+                            <li>Fill in the employee details in the Excel file</li>
+                            <li>Upload the completed file using the form below</li>
+                        </ol>
+                        <p><strong>Required fields:</strong> Employee Name, Position, Basic Salary</p>
+                        <p><strong>Optional fields:</strong> Department, Housing Allowance, Lunch Allowance, Transport Allowance, Overtime, NRC</p>
+                    </div>
+
+                    <div class="mb-4 text-center">
+                        <a href="{{ url_for('download_employee_template') }}" class="btn btn-success">
+                            <i class="fas fa-download"></i> Download Template
+                        </a>
+                    </div>
+
+                    <form action="{{ url_for('import_employees') }}" method="POST" enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <label for="excel_file" class="form-label">Select Excel File</label>
+                            <input type="file" class="form-control" id="excel_file" name="excel_file" accept=".xlsx,.xls" required>
+                            <div class="form-text">Only .xlsx and .xls files are supported</div>
+                        </div>
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-upload"></i> Upload and Import
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

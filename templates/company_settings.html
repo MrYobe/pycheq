@@ -1,0 +1,378 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mb-4">
+    <!-- Company Information Card -->
+    <div class="row justify-content-center mb-4">
+        <div class="col-md-10">
+            <div class="card shadow">
+                <div class="card-header">
+                    <h3>Company Information</h3>
+                </div>
+                <div class="card-body">
+                    <form method="POST" enctype="multipart/form-data">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="mb-3">
+                                    <label for="name" class="form-label">Company Name</label>
+                                    <input type="text" class="form-control" id="name" name="name" value="{{ company.name if company else '' }}" required>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="address" class="form-label">Address</label>
+                                    <textarea class="form-control" id="address" name="address" rows="3" required>{{ company.address if company else '' }}</textarea>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="phone" class="form-label">Phone Number</label>
+                                            <input type="tel" class="form-control" id="phone" name="phone" value="{{ company.phone if company else '' }}" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="email" class="form-label">Email Address</label>
+                                            <input type="email" class="form-control" id="email" name="email" value="{{ company.email if company else '' }}" required>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="website" class="form-label">Website</label>
+                                    <input type="url" class="form-control" id="website" name="website" value="{{ company.website if company else '' }}" placeholder="https://example.com">
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="registration_number" class="form-label">Registration Number</label>
+                                            <input type="text" class="form-control" id="registration_number" name="registration_number" value="{{ company.registration_number if company else '' }}" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="tax_number" class="form-label">Tax Number</label>
+                                            <input type="text" class="form-control" id="tax_number" name="tax_number" value="{{ company.tax_number if company else '' }}" required>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="logo" class="form-label">Company Logo</label>
+                                    {% if company and company.logo %}
+                                    <div class="mb-2">
+                                        <img src="{{ url_for('static', filename=company.logo) }}" class="img-fluid rounded" alt="Company Logo">
+                                    </div>
+                                    {% endif %}
+                                    
+                                    <!-- Existing Images Selection -->
+                                    <div class="mb-3">
+                                        <label for="existing_logo" class="form-label">Select Existing Image</label>
+                                        <select class="form-select mb-2" id="existing_logo" name="existing_logo">
+                                            <option value="none">-- Select an existing image --</option>
+                                            {% for image in existing_images %}
+                                            <option value="{{ image.path }}" {% if company and company.logo == image.path %}selected{% endif %}>
+                                                {{ image.filename }}
+                                            </option>
+                                            {% endfor %}
+                                        </select>
+                                        
+                                        {% if existing_images %}
+                                        <div class="image-preview-container border p-2 mb-3" style="max-height: 200px; overflow-y: auto;">
+                                            <div class="row g-2">
+                                                {% for image in existing_images %}
+                                                <div class="col-4">
+                                                    <div class="image-preview" data-path="{{ image.path }}">
+                                                        <img src="{{ image.url }}" class="img-thumbnail" alt="{{ image.filename }}">
+                                                        <div class="small text-center text-truncate" style="max-width: 100%;">{{ image.filename }}</div>
+                                                    </div>
+                                                </div>
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <!-- Upload New Image -->
+                                    <label for="logo" class="form-label">Or Upload New Logo</label>
+                                    <input type="file" class="form-control" id="logo" name="logo" accept="image/*">
+                                    <small class="form-text text-muted">Upload a new logo (optional)</small>
+                                    <small class="form-text text-muted d-block">Supported formats: PNG, JPG, JPEG, GIF</small>
+                                    <small class="form-text text-muted d-block">Max size: 16MB</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        
+                        <!-- Email Configuration Section -->
+                        <div class="mt-4">
+                            <h4>Email Configuration</h4>
+                            <hr>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="email_server" class="form-label">SMTP Server</label>
+                                        <input type="text" class="form-control" id="email_server" name="email_server" value="{{ company.email_server if company else '' }}" placeholder="smtp.example.com">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="email_port" class="form-label">SMTP Port</label>
+                                        <input type="number" class="form-control" id="email_port" name="email_port" value="{{ company.email_port if company else '' }}" placeholder="587">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="email_username" class="form-label">SMTP Username</label>
+                                        <input type="text" class="form-control" id="email_username" name="email_username" value="{{ company.email_username if company else '' }}" placeholder="username@example.com">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="email_password" class="form-label">SMTP Password</label>
+                                        <input type="password" class="form-control" id="email_password" name="email_password" value="{{ company.email_password if company else '' }}" placeholder="Password">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="email_signature" class="form-label">Email Signature</label>
+                                <textarea class="form-control" id="email_signature" name="email_signature" rows="3">{{ company.email_signature if company else '' }}</textarea>
+                            </div>
+                        </div>
+<div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">Save Company Information</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Branch Management Card -->
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card shadow">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h3 class="mb-0">Branch Management</h3>
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addBranchModal">
+                        <i class="fas fa-plus"></i> Add Branch
+                    </button>
+                </div>
+                <div class="card-body">
+                    {% if branches %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Address</th>
+                                    <th>Phone</th>
+                                    <th>Email</th>
+                                    <th>Manager</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for branch in branches %}
+                                <tr>
+                                    <td>{{ branch.name }}</td>
+                                    <td>{{ branch.address }}</td>
+                                    <td>{{ branch.phone }}</td>
+                                    <td>{{ branch.email }}</td>
+                                    <td>{{ branch.manager }}</td>
+                                    <td>
+                                        {% if branch.is_active %}
+                                        <span class="badge bg-success">Active</span>
+                                        {% else %}
+                                        <span class="badge bg-danger">Inactive</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <button type="button" class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#editBranchModal{{ branch.id }}">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteBranchModal{{ branch.id }}">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i> No branches have been added yet. Click "Add Branch" to create your first branch.
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Branch Modal -->
+<div class="modal fade" id="addBranchModal" tabindex="-1" aria-labelledby="addBranchModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addBranchModalLabel">Add New Branch</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="POST">
+                <div class="modal-body">
+                    <input type="hidden" name="branch_action" value="add">
+                    
+                    <div class="mb-3">
+                        <label for="branch_name" class="form-label">Branch Name</label>
+                        <input type="text" class="form-control" id="branch_name" name="branch_name" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="branch_address" class="form-label">Address</label>
+                        <textarea class="form-control" id="branch_address" name="branch_address" rows="2"></textarea>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="branch_phone" class="form-label">Phone Number</label>
+                        <input type="tel" class="form-control" id="branch_phone" name="branch_phone">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="branch_email" class="form-label">Email Address</label>
+                        <input type="email" class="form-control" id="branch_email" name="branch_email">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="branch_manager" class="form-label">Branch Manager</label>
+                        <input type="text" class="form-control" id="branch_manager" name="branch_manager">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Add Branch</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Branch Modals -->
+{% for branch in branches %}
+<div class="modal fade" id="editBranchModal{{ branch.id }}" tabindex="-1" aria-labelledby="editBranchModalLabel{{ branch.id }}" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editBranchModalLabel{{ branch.id }}">Edit Branch</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="POST">
+                <div class="modal-body">
+                    <input type="hidden" name="branch_action" value="edit">
+                    <input type="hidden" name="branch_id" value="{{ branch.id }}">
+                    
+                    <div class="mb-3">
+                        <label for="branch_name{{ branch.id }}" class="form-label">Branch Name</label>
+                        <input type="text" class="form-control" id="branch_name{{ branch.id }}" name="branch_name" value="{{ branch.name }}" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="branch_address{{ branch.id }}" class="form-label">Address</label>
+                        <textarea class="form-control" id="branch_address{{ branch.id }}" name="branch_address" rows="2">{{ branch.address }}</textarea>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="branch_phone{{ branch.id }}" class="form-label">Phone Number</label>
+                        <input type="tel" class="form-control" id="branch_phone{{ branch.id }}" name="branch_phone" value="{{ branch.phone }}">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="branch_email{{ branch.id }}" class="form-label">Email Address</label>
+                        <input type="email" class="form-control" id="branch_email{{ branch.id }}" name="branch_email" value="{{ branch.email }}">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="branch_manager{{ branch.id }}" class="form-label">Branch Manager</label>
+                        <input type="text" class="form-control" id="branch_manager{{ branch.id }}" name="branch_manager" value="{{ branch.manager }}">
+                    </div>
+                    
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="branch_active{{ branch.id }}" name="branch_active" {% if branch.is_active %}checked{% endif %}>
+                        <label class="form-check-label" for="branch_active{{ branch.id }}">Active</label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Update Branch</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endfor %}
+
+<!-- Delete Branch Modals -->
+{% for branch in branches %}
+<div class="modal fade" id="deleteBranchModal{{ branch.id }}" tabindex="-1" aria-labelledby="deleteBranchModalLabel{{ branch.id }}" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteBranchModalLabel{{ branch.id }}">Delete Branch</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="POST">
+                <div class="modal-body">
+                    <input type="hidden" name="branch_action" value="delete">
+                    <input type="hidden" name="branch_id" value="{{ branch.id }}">
+                    
+                    <p>Are you sure you want to delete the branch <strong>{{ branch.name }}</strong>?</p>
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle"></i> This action cannot be undone. Branches with assigned employees cannot be deleted.
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-danger">Delete Branch</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endfor %}
+
+<!-- Add JavaScript for image selection interaction -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Get references to elements
+        const existingLogoSelect = document.getElementById('existing_logo');
+        const imagePreviews = document.querySelectorAll('.image-preview');
+        
+        // Add click event to image previews
+        imagePreviews.forEach(preview => {
+            preview.addEventListener('click', function() {
+                const path = this.getAttribute('data-path');
+                existingLogoSelect.value = path;
+                
+                // Highlight selected image
+                imagePreviews.forEach(p => p.classList.remove('border', 'border-primary'));
+                this.classList.add('border', 'border-primary');
+            });
+        });
+        
+        // Highlight initially selected image if any
+        if (existingLogoSelect.value !== 'none') {
+            const selectedPath = existingLogoSelect.value;
+            const selectedPreview = document.querySelector(`.image-preview[data-path="${selectedPath}"]`);
+            if (selectedPreview) {
+                selectedPreview.classList.add('border', 'border-primary');
+            }
+        }
+    });
+</script>
+{% endblock %}

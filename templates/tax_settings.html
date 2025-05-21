@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col">
+            <h2><i class="fas fa-percent"></i> Tax Settings</h2>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card shadow mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">PAYE Tax Brackets</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        <div class="mb-3">
+                            <label class="form-label">Bracket 1 (K0 - K5,100)</label>
+                            <div class="input-group">
+                                <input type="number" class="form-control" name="bracket1" value="0" step="0.01">
+                                <span class="input-group-text">%</span>
+                            </div>
+                            <small class="text-muted">First K5,100 is tax-free</small>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Bracket 2 (K5,100.01 - K7,100)</label>
+                            <div class="input-group">
+                                <input type="number" class="form-control" name="bracket2" value="20" step="0.01">
+                                <span class="input-group-text">%</span>
+                            </div>
+                            <small class="text-muted">20% on income between K5,100.01 and K7,100</small>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Bracket 3 (K7,100.01 - K9,200)</label>
+                            <div class="input-group">
+                                <input type="number" class="form-control" name="bracket3" value="30" step="0.01">
+                                <span class="input-group-text">%</span>
+                            </div>
+                            <small class="text-muted">30% on income between K7,100.01 and K9,200</small>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Bracket 4 (Above K9,200)</label>
+                            <div class="input-group">
+                                <input type="number" class="form-control" name="bracket4" value="37" step="0.01">
+                                <span class="input-group-text">%</span>
+                            </div>
+                            <small class="text-muted">37% on income above K9,200</small>
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Save Changes
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card shadow mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Other Deductions</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        <div class="mb-3">
+                            <label class="form-label">NAPSA (%)</label>
+                            <div class="input-group">
+                                <input type="number" class="form-control" name="napsa" value="5" step="0.01">
+                                <span class="input-group-text">%</span>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">NHIMA (%)</label>
+                            <div class="input-group">
+                                <input type="number" class="form-control" name="nhima" value="1" step="0.01">
+                                <span class="input-group-text">%</span>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Save Changes
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

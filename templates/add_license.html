@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title mb-0">Add New License</h3>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('license.add_license') }}">
+                        <div class="mb-3">
+                            <label for="license_key" class="form-label">License Key</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="license_key" name="license_key" value="{{ generated_key }}" required>
+                                <button type="button" class="btn btn-outline-secondary" onclick="generateNewKey()">
+                                    <i class="fas fa-sync"></i> Generate New
+                                </button>
+                            </div>
+                            <small class="text-muted">Format: XXXX-XXXX-XXXX-XXXX-YYYY</small>
+                        </div>
+                        <div class="mb-3">
+                            <label for="end_date" class="form-label">Expiration Date</label>
+                            <input type="date" class="form-control" id="end_date" name="end_date" required>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ url_for('license.licenses') }}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Back to Licenses
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Save License
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function generateNewKey() {
+    // Make an AJAX call to generate a new key
+    fetch('{{ url_for("license.add_license") }}')
+        .then(response => response.text())
+        .then(html => {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            const newKey = doc.getElementById('license_key').value;
+            document.getElementById('license_key').value = newKey;
+        });
+}
+</script>
+{% endblock %} 

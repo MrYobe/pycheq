@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row mb-4">
+        <div class="col">
+            <div class="d-flex justify-content-between align-items-center">
+                <h2><i class="fas fa-file-pdf"></i> {{ report.name }}</h2>
+                <div>
+                    <a href="{{ url_for('payroll_reports') }}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>Back to Reports
+                    </a>
+                    <a href="{{ url_for('download_report', id=report.id) }}" class="btn btn-primary">
+                        <i class="fas fa-download me-2"></i>Download
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col">
+            <div class="card shadow">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">Report Details</h5>
+                        <span class="badge bg-info">{{ report.format }}</span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <strong>Type:</strong> {{ report.type }}
+                        </div>
+                        <div class="col-md-4">
+                            <strong>Generated:</strong> {{ report.generated_at.strftime('%Y-%m-%d %H:%M') }}
+                        </div>
+                        <div class="col-md-4">
+                            <strong>Period:</strong> {% if report.month %}{{ report.month | month_name }}{% endif %} {{ report.year }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col">
+            <div class="card shadow">
+                <div class="card-body p-0">
+                    <div class="embed-responsive" style="height: 800px;">
+                        <object data="{{ url_for('view_pdf', filename=report.file_path.split('/')[-1]) }}" type="application/pdf" width="100%" height="100%">
+                            <p>It appears your browser doesn't support embedded PDFs. You can <a href="{{ url_for('download_report', id=report.id) }}">download the PDF</a> instead.</p>
+                        </object>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

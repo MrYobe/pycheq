@@ -1,0 +1,178 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col">
+            <h2><i class="fas fa-file-invoice-dollar"></i> Employee Payslip</h2>
+            <p class="text-muted">For {{ record.employee.name }} - {{ pay_month }}</p>
+        </div>
+    </div>
+    
+    <div class="row mb-3">
+        <div class="col">
+            <div class="d-flex justify-content-between">
+                <a href="{{ url_for('payroll_records') }}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left me-2"></i>Back to Payroll Records
+                </a>
+                <a href="{{ url_for('download_payslip', record_id=record.id, download='true') }}" class="btn btn-primary">
+                    <i class="fas fa-download me-2"></i>Download PDF
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow mb-4">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h3 class="mb-0">{{ company.name }}</h3>
+                    <h4 class="mb-0">PAYSLIP</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <p><strong>Address:</strong> {{ company.address }}</p>
+                            <p><strong>Phone:</strong> {{ company.phone }}</p>
+                            <p><strong>Email:</strong> {{ company.email }}</p>
+                        </div>
+                        <div class="col-md-6 text-md-end">
+                            <p><strong>Registration #:</strong> {{ company.registration_number }}</p>
+                            <p><strong>Tax #:</strong> {{ company.tax_number }}</p>
+                            <p><strong>Pay Date:</strong> {{ record.pay_date }}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <div class="card bg-light">
+                                <div class="card-header">
+                                    <h5 class="mb-0">Employee Details</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <p><strong>Name:</strong> {{ record.employee.name }}</p>
+                                            <p><strong>Position:</strong> {{ record.employee.position }}</p>
+                                            <p><strong>Department:</strong> {{ record.employee.department }}</p>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <p><strong>Employee Code:</strong> {{ record.employee.employee_code }}</p>
+                                            <p><strong>Email:</strong> {{ record.employee.email }}</p>
+                                            <p><strong>Branch:</strong> {{ record.employee.branch.name if record.employee.branch else '' }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header bg-success text-white">
+                                    <h5 class="mb-0">Earnings</h5>
+                                </div>
+                                <div class="card-body p-0">
+                                    <table class="table table-striped mb-0">
+                                        <tbody>
+                                            <tr>
+                                                <td>Basic Salary</td>
+                                                <td class="text-end">K {{ "{:,.2f}".format(record.basic_salary) }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Housing Allowance</td>
+                                                <td class="text-end">K {{ "{:,.2f}".format(record.housing_allowance) }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Lunch Allowance</td>
+                                                <td class="text-end">K {{ "{:,.2f}".format(record.lunch_allowance) }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Transport Allowance</td>
+                                                <td class="text-end">K {{ "{:,.2f}".format(record.transport_allowance) }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Overtime</td>
+                                                <td class="text-end">K {{ "{:,.2f}".format(record.overtime) }}</td>
+                                            </tr>
+                                            <tr class="table-success">
+                                                <th>Gross Pay</th>
+                                                <th class="text-end">K {{ "{:,.2f}".format(record.gross_pay) }}</th>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header bg-danger text-white">
+                                    <h5 class="mb-0">Deductions</h5>
+                                </div>
+                                <div class="card-body p-0">
+                                    <table class="table table-striped mb-0">
+                                        <tbody>
+                                            <tr>
+                                                <td>PAYE</td>
+                                                <td class="text-end">K {{ "{:,.2f}".format(record.paye) }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>NAPSA</td>
+                                                <td class="text-end">K {{ "{:,.2f}".format(record.napsa) }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>NHIMA</td>
+                                                <td class="text-end">K {{ "{:,.2f}".format(record.nhima) }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Salary Advance</td>
+                                                <td class="text-end">K {{ "{:,.2f}".format(record.salary_advance) }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Rainbow Loan</td>
+                                                <td class="text-end">K {{ "{:,.2f}".format(record.rainbow_loan) }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Other Deduction</td>
+                                                <td class="text-end">K {{ "{:,.2f}".format(record.other_deduction) }}</td>
+                                            </tr>
+                                            <tr class="table-danger">
+                                                <th>Total Deductions</th>
+                                                <th class="text-end">K {{ "{:,.2f}".format(record.total_deductions) }}</th>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <div class="card bg-primary text-white">
+                                <div class="card-body">
+                                    <div class="row align-items-center">
+                                        <div class="col-6">
+                                            <h4 class="mb-0">Net Pay</h4>
+                                        </div>
+                                        <div class="col-6 text-end">
+                                            <h3 class="mb-0">K {{ "{:,.2f}".format(record.net_pay) }}</h3>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-12 text-center">
+                            <p class="text-muted">Generated on: {{ generated_date }} | This is a computer-generated document and requires no signature.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

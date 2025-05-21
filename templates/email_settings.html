@@ -1,0 +1,183 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col">
+            <h2><i class="fas fa-envelope"></i> Email Settings</h2>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card shadow mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">SMTP Configuration</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        <input type="hidden" name="save_settings" value="1">
+                        <div class="row mb-3">
+                            <div class="col-md-8">
+                                <label class="form-label">SMTP Server</label>
+                                <select class="form-control" name="smtp_server" id="smtp_server" required>
+                                    <option value="development" {% if email_settings and email_settings.smtp_server == 'development' %}selected{% endif %}>Development Mode (Save to File)</option>
+                                    <option value="mail.fandu.co.zm" {% if email_settings and email_settings.smtp_server == 'mail.fandu.co.zm' %}selected{% endif %}>mail.fandu.co.zm</option>
+                                    <option value="imbra.email" {% if email_settings and email_settings.smtp_server == 'imbra.email' %}selected{% endif %}>imbra.email</option>
+                                    <option value="smtp.gmail.com" {% if email_settings and email_settings.smtp_server == 'smtp.gmail.com' %}selected{% endif %}>smtp.gmail.com</option>
+                                    <option value="smtp.office365.com" {% if email_settings and email_settings.smtp_server == 'smtp.office365.com' %}selected{% endif %}>smtp.office365.com</option>
+                                    <option value="custom" {% if email_settings and email_settings.smtp_server and email_settings.smtp_server not in ['development', 'mail.fandu.co.zm', 'imbra.email', 'smtp.gmail.com', 'smtp.office365.com'] %}selected{% endif %}>Custom</option>
+                                </select>
+                                <input type="text" class="form-control mt-2" name="custom_smtp_server" id="custom_smtp_server" placeholder="Custom SMTP Server" {% if email_settings and email_settings.smtp_server and email_settings.smtp_server not in ['development', 'mail.fandu.co.zm', 'imbra.email', 'smtp.gmail.com', 'smtp.office365.com'] %}value="{{ email_settings.smtp_server }}"{% endif %} style="display: none;">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Port</label>
+                                <input type="number" class="form-control" name="smtp_port" value="{{ email_settings.smtp_port }}" required>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="use_tls" name="use_tls" {% if email_settings.use_tls %}checked{% endif %}>
+                                    <label class="form-check-label" for="use_tls">Use TLS</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="use_ssl" name="use_ssl" {% if email_settings.use_ssl %}checked{% endif %}>
+                                    <label class="form-check-label" for="use_ssl">Use SSL</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Email Username</label>
+                            <input type="text" class="form-control" name="username" value="{{ email_settings.username }}" required>
+                            <small class="text-muted">Usually your full email address</small>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Email Password</label>
+                            <input type="password" class="form-control" name="password" placeholder="{% if email_settings.password %}••••••••••••{% else %}Enter password{% endif %}">
+                            <small class="text-muted">Leave blank to keep current password</small>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Default Sender</label>
+                            <input type="text" class="form-control" name="default_sender" value="{{ email_settings.default_sender }}" required>
+                            <small class="text-muted">Email address that will appear in the From field</small>
+                        </div>
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="enabled" name="enabled" {% if email_settings.enabled %}checked{% endif %}>
+                            <label class="form-check-label" for="enabled">
+                                <strong>Enable Email Functionality</strong>
+                            </label>
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Save Settings
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="card shadow mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Email Templates</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        <input type="hidden" name="save_settings" value="1">
+                        <div class="mb-3">
+                            <label class="form-label">Email Signature</label>
+                            <textarea class="form-control" name="email_signature" rows="4">{{ company.email_signature }}</textarea>
+                            <small class="text-muted">This will be added to the bottom of payslip emails</small>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Email Footer</label>
+                            <textarea class="form-control" name="email_footer" rows="4">{{ company.email_footer }}</textarea>
+                            <small class="text-muted">HTML content to be added at the bottom of all emails</small>
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Save Templates
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Test Email</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        <input type="hidden" name="test_email" value="1">
+                        <div class="mb-3">
+                            <label class="form-label">Recipient Email</label>
+                            <input type="email" class="form-control" name="test_recipient" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary" {% if not email_settings.enabled %}disabled{% endif %}>
+                            <i class="fas fa-paper-plane"></i> Send Test Email
+                        </button>
+                        {% if not email_settings.enabled %}
+                        <small class="text-danger d-block mt-2">Email functionality is disabled. Enable it in settings above.</small>
+                        {% endif %}
+                    </form>
+                </div>
+            </div>
+
+            <div class="card shadow">
+                <div class="card-header">
+                    <h5 class="mb-0">Help</h5>
+                </div>
+                <div class="card-body">
+                    <h6>Common SMTP Settings</h6>
+                    <div class="mb-3">
+                        <strong>Gmail:</strong>
+                        <ul class="mb-0">
+                            <li>Server: smtp.gmail.com</li>
+                            <li>Port: 587</li>
+                            <li>Use TLS: Yes</li>
+                            <li>Use SSL: No</li>
+                        </ul>
+                        <small class="text-muted">For Gmail, you may need to use an App Password if 2FA is enabled.</small>
+                    </div>
+                    <div class="mb-3">
+                        <strong>Outlook/Office 365:</strong>
+                        <ul class="mb-0">
+                            <li>Server: smtp.office365.com</li>
+                            <li>Port: 587</li>
+                            <li>Use TLS: Yes</li>
+                            <li>Use SSL: No</li>
+                        </ul>
+                    </div>
+                    <div class="mb-3">
+                        <strong>Yahoo:</strong>
+                        <ul class="mb-0">
+                            <li>Server: smtp.mail.yahoo.com</li>
+                            <li>Port: 587</li>
+                            <li>Use TLS: Yes</li>
+                            <li>Use SSL: No</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const smtpServerSelect = document.getElementById('smtp_server');
+        const customSmtpServerInput = document.getElementById('custom_smtp_server');
+
+        smtpServerSelect.addEventListener('change', function() {
+            if (smtpServerSelect.value === 'custom') {
+                customSmtpServerInput.style.display = 'block';
+            } else {
+                customSmtpServerInput.style.display = 'none';
+            }
+        });
+
+        // Trigger the event to set the initial state
+        smtpServerSelect.dispatchEvent(new Event('change'));
+    });
+</script>
+{% endblock %}

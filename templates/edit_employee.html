@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title mb-0">Edit Employee - {{ employee.employee_code }}</h3>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Full Name</label>
+                            <input type="text" class="form-control" id="name" name="name" value="{{ employee.name }}" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="nrc" class="form-label">NRC Number</label>
+                            <input type="text" class="form-control" id="nrc" name="nrc" value="{{ employee.nrc }}" required 
+                                   pattern="[0-9]{6}/[0-9]{2}/[0-9]{1}" 
+                                   title="Please enter a valid NRC number in format: 000000/00/0">
+                        </div>
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email (Optional)</label>
+                            <input type="email" class="form-control" id="email" name="email" value="{% if employee.email %}{{ employee.email }}{% endif %}">
+                        </div>
+                        <div class="mb-3">
+                            <label for="position" class="form-label">Position</label>
+                            <input type="text" class="form-control" id="position" name="position" value="{{ employee.position }}">
+                        </div>
+                        <div class="mb-3">
+                            <label for="department" class="form-label">Department</label>
+                            <select class="form-select" id="department" name="department">
+                                <option value="">Select Department</option>
+                                <option value="Finance" {% if employee.department == 'Finance' %}selected{% endif %}>Finance</option>
+                                <option value="Human Resources" {% if employee.department == 'Human Resources' %}selected{% endif %}>Human Resources</option>
+                                <option value="Information Technology" {% if employee.department == 'Information Technology' %}selected{% endif %}>Information Technology</option>
+                                <option value="Operations" {% if employee.department == 'Operations' %}selected{% endif %}>Operations</option>
+                                <option value="Sales" {% if employee.department == 'Sales' %}selected{% endif %}>Sales</option>
+                                <option value="Marketing" {% if employee.department == 'Marketing' %}selected{% endif %}>Marketing</option>
+                                <option value="Research" {% if employee.department == 'Research' %}selected{% endif %}>Research</option>
+                                <option value="Administration" {% if employee.department == 'Administration' %}selected{% endif %}>Administration</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="branch" class="form-label">Branch</label>
+                            <select class="form-select" id="branch" name="branch">
+                                <option value="">Select Branch (Optional)</option>
+                                {% for branch in branches %}
+                                <option value="{{ branch.id }}" {% if employee.branch_id == branch.id %}selected{% endif %}>{{ branch.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="basic_salary" class="form-label">Basic Salary (ZMW)</label>
+                            <div class="input-group">
+                                <span class="input-group-text">K</span>
+                                <input type="number" step="0.01" min="0" class="form-control" id="basic_salary" name="basic_salary" value="{{ employee.basic_salary }}">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="housing_allowance" class="form-label">Housing Allowance (ZMW)</label>
+                            <div class="input-group">
+                                <span class="input-group-text">K</span>
+                                <input type="number" step="0.01" min="0" class="form-control" id="housing_allowance" name="housing_allowance" value="{% if employee.housing_allowance %}{{ employee.housing_allowance }}{% endif %}">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="lunch_allowance" class="form-label">Lunch Allowance (ZMW)</label>
+                            <div class="input-group">
+                                <span class="input-group-text">K</span>
+                                <input type="number" step="0.01" min="0" class="form-control" id="lunch_allowance" name="lunch_allowance" value="{% if employee.lunch_allowance %}{{ employee.lunch_allowance }}{% endif %}">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="transport_allowance" class="form-label">Transport Allowance (ZMW)</label>
+                            <div class="input-group">
+                                <span class="input-group-text">K</span>
+                                <input type="number" step="0.01" min="0" class="form-control" id="transport_allowance" name="transport_allowance" value="{% if employee.transport_allowance %}{{ employee.transport_allowance }}{% endif %}">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="overtime" class="form-label">Overtime (ZMW)</label>
+                            <div class="input-group">
+                                <span class="input-group-text">K</span>
+                                <input type="number" step="0.01" min="0" class="form-control" id="overtime" name="overtime" value="{% if employee.overtime %}{{ employee.overtime }}{% endif %}">
+                            </div>
+                            <div class="form-text">
+                                <h6 class="mt-3">Deductions:</h6>
+                                <ul>
+                                    <li>PAYE (Tax brackets):</li>
+                                    <ul>
+                                        <li>First K5,100.00: 0%</li>
+                                        <li>K5,100.01 - K7,100.00: 20%</li>
+                                        <li>K7,100.01 - K9,200.00: 30%</li>
+                                        <li>Above K9,200.00: 37%</li>
+                                    </ul>
+                                    <li>NAPSA: 5% of basic salary (max K1,221.80)</li>
+                                    <li>NHIMA: 1% of basic salary</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <!-- Additional Deduction Fields -->
+                        <div class="mb-3">
+                            <h6>Additional Deductions (Optional):</h6>
+                            <div class="mb-2">
+                                <label for="salary_advance" class="form-label">Salary Advance (ZMW)</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">K</span>
+                                    <input type="number" step="0.01" min="0" class="form-control" id="salary_advance" name="salary_advance" value="{% if employee.salary_advance %}{{ employee.salary_advance }}{% endif %}">
+                                </div>
+                            </div>
+                            <div class="mb-2">
+                                <label for="rainbow_loan" class="form-label">Rainbow Loan (ZMW)</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">K</span>
+                                    <input type="number" step="0.01" min="0" class="form-control" id="rainbow_loan" name="rainbow_loan" value="{% if employee.rainbow_loan %}{{ employee.rainbow_loan }}{% endif %}">
+                                </div>
+                            </div>
+                            <div class="mb-2">
+                                <label for="other_deduction" class="form-label">Other Deduction (ZMW)</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">K</span>
+                                    <input type="number" step="0.01" min="0" class="form-control" id="other_deduction" name="other_deduction" value="{% if employee.other_deduction %}{{ employee.other_deduction }}{% endif %}">
+                                </div>
+                            </div>
+                            <div class="mb-2">
+                                <label for="other_deduction_reason" class="form-label">Reason for Other Deduction</label>
+                                <input type="text" class="form-control" id="other_deduction_reason" name="other_deduction_reason" value="{% if employee.other_deduction_reason %}{{ employee.other_deduction_reason }}{% endif %}" placeholder="Enter reason for other deduction">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" id="is_active" name="is_active" {% if employee.is_active %}checked{% endif %}>
+                                <label class="form-check-label" for="is_active">Active Employee</label>
+                            </div>
+                        </div>
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">Update Employee</button>
+                            <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

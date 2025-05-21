@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow mt-5">
+                <div class="card-header bg-gradient-primary text-white">
+                    <h4 class="mb-0">Restart Application</h4>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <strong>Warning:</strong> Restarting the application will temporarily disconnect all users. Any unsaved data may be lost.
+                    </div>
+                    
+                    <p>Are you sure you want to restart the application?</p>
+                    
+                    <form method="POST" action="{{ url_for('restart_app') }}">
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="{{ url_for('settings') }}" class="btn btn-secondary">
+                                <i class="fas fa-times me-2"></i>Cancel
+                            </a>
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-sync-alt me-2"></i>Restart Application
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

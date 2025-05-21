@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow mt-5">
+                <div class="card-header bg-gradient-primary text-white">
+                    <h4 class="mb-0">Restarting Application</h4>
+                </div>
+                <div class="card-body text-center">
+                    <div class="spinner-border text-primary mb-4" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    
+                    <h5>Please wait while the application restarts...</h5>
+                    <p class="text-muted">This may take a few seconds. You will be redirected automatically.</p>
+                    
+                    <div class="progress mt-4">
+                        <div id="progress-bar" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%"></div>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <a href="{{ url_for('dashboard') }}" class="btn btn-primary" id="continue-btn" style="display: none;">
+                            <i class="fas fa-arrow-right me-2"></i>Continue to Dashboard
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    $(document).ready(function() {
+        let progress = 0;
+        const progressBar = $('#progress-bar');
+        const continueBtn = $('#continue-btn');
+        let checkCount = 0;
+        let maxChecks = 10;
+        
+        // Update progress bar
+        function updateProgress() {
+            progress += 10;
+            progressBar.css('width', progress + '%');
+            
+            if (progress >= 100) {
+                clearInterval(progressInterval);
+                continueBtn.show();
+            }
+        }
+        
+        // Check if server is back online
+        function checkServer() {
+            $.ajax({
+                url: '{{ url_for("test_route") }}',
+                type: 'GET',
+                timeout: 2000,
+                success: function() {
+                    // Server is back online
+                    progress = 100;
+                    progressBar.css('width', '100%');
+                    clearInterval(progressInterval);
+                    clearInterval(checkInterval);
+                    continueBtn.show();
+                    
+                    // Redirect after a short delay
+                    setTimeout(function() {
+                        window.location.href = '{{ url_for("dashboard") }}';
+                    }, 1500);
+                },
+                error: function() {
+                    checkCount++;
+                    if (checkCount >= maxChecks) {
+                        // Stop checking after max attempts
+                        clearInterval(checkInterval);
+                        $('.card-body').append('<div class="alert alert-warning mt-3">Server seems to be taking longer than expected. <a href="{{ url_for("dashboard") }}">Try manually</a>.</div>');
+                    }
+                }
+            });
+        }
+        
+        // Start progress animation
+        const progressInterval = setInterval(updateProgress, 1000);
+        
+        // Start checking server status
+        const checkInterval = setInterval(checkServer, 2000);
+        
+        // Initial check
+        setTimeout(checkServer, 1000);
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,274 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h2>Payroll Reports</h2>
+        </div>
+        <div class="col-md-4">
+            <form class="d-flex gap-2" method="GET">
+                <select name="type" class="form-select" onchange="this.form.submit()">
+                    <option value="monthly" {% if data.report_type == 'monthly' %}selected{% endif %}>Monthly Report</option>
+                    <option value="annual" {% if data.report_type == 'annual' %}selected{% endif %}>Annual Report</option>
+                </select>
+                
+                <select name="year" class="form-select" onchange="this.form.submit()">
+                    {% for year in data.available_years %}
+                    <option value="{{ year }}" {% if year == data.current_year %}selected{% endif %}>{{ year }}</option>
+                    {% endfor %}
+                </select>
+                
+                {% if data.report_type == 'monthly' %}
+                <select name="month" class="form-select" onchange="this.form.submit()">
+                    {% for month in range(1, 13) %}
+                    <option value="{{ month }}" {% if month == data.current_month %}selected{% endif %}>
+                        {{ month | month_name }}
+                    </option>
+                    {% endfor %}
+                </select>
+                {% endif %}
+            </form>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Employee Overview</h5>
+                    <div class="row">
+                        <div class="col-6">
+                            <p class="mb-1">Total Employees</p>
+                            <h3>{{ data.total_employees }}</h3>
+                        </div>
+                        <div class="col-6">
+                            <p class="mb-1">Active Employees</p>
+                            <h3>{{ data.active_employees }}</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body text-end">
+                    <div class="btn-group">
+                        <a href="{{ url_for('download_report', type=data.report_type, year=data.current_year, month=data.current_month) }}" class="btn btn-primary">
+                            <i class="fas fa-download"></i> Download Report
+                        </a>
+                        <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#emailReportModal">
+                            <i class="fas fa-envelope"></i> Email Report
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if data.report_type == 'monthly' %}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Monthly Summary - {{ data.current_month | month_name }} {{ data.current_year }}</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="card bg-success text-white mb-3">
+                                <div class="card-body">
+                                    <h6 class="card-title">Total Gross Pay</h6>
+                                    <h3 class="mb-0">K {{ "{:,.2f}".format(data.total_gross) }}</h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card bg-danger text-white mb-3">
+                                <div class="card-body">
+                                    <h6 class="card-title">Total Deductions</h6>
+                                    <h3 class="mb-0">K {{ "{:,.2f}".format(data.total_deductions) }}</h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card bg-primary text-white mb-3">
+                                <div class="card-body">
+                                    <h6 class="card-title">Total Net Pay</h6>
+                                    <h3 class="mb-0">K {{ "{:,.2f}".format(data.total_net) }}</h3>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mt-4">
+                        <div class="col-md-6">
+                            <h5>Earnings Breakdown</h5>
+                            <table class="table">
+                                <tr>
+                                    <td>Basic Salary</td>
+                                    <td class="text-end">K {{ "{:,.2f}".format(data.total_basic_salary) }}</td>
+                                </tr>
+                                <tr>
+                                    <td>Allowance</td>
+                                    <td class="text-end">K {{ "{:,.2f}".format(data.total_allowance) }}</td>
+                                </tr>
+                                <tr class="table-success">
+                                    <td><strong>Total Gross Pay</strong></td>
+                                    <td class="text-end"><strong>K {{ "{:,.2f}".format(data.total_gross) }}</strong></td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>Deductions Breakdown</h5>
+                            <table class="table">
+                                <tr>
+                                    <td>PAYE</td>
+                                    <td class="text-end">K {{ "{:,.2f}".format(data.total_paye) }}</td>
+                                </tr>
+                                <tr>
+                                    <td>NAPSA</td>
+                                    <td class="text-end">K {{ "{:,.2f}".format(data.total_napsa) }}</td>
+                                </tr>
+                                <tr>
+                                    <td>NHIMA</td>
+                                    <td class="text-end">K {{ "{:,.2f}".format(data.total_nhima) }}</td>
+                                </tr>
+                                <tr class="table-danger">
+                                    <td><strong>Total Deductions</strong></td>
+                                    <td class="text-end"><strong>K {{ "{:,.2f}".format(data.total_deductions) }}</strong></td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <h5>Department Breakdown</h5>
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Department</th>
+                                        <th class="text-end">Employees</th>
+                                        <th class="text-end">Total Gross</th>
+                                        <th class="text-end">Total Net</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for dept, totals in data.department_totals.items() %}
+                                    <tr>
+                                        <td>{{ dept }}</td>
+                                        <td class="text-end">{{ totals.count }}</td>
+                                        <td class="text-end">K {{ "{:,.2f}".format(totals.total_gross) }}</td>
+                                        <td class="text-end">K {{ "{:,.2f}".format(totals.total_net) }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Annual Summary - {{ data.current_year }}</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <div class="col-md-4">
+                            <div class="card bg-success text-white">
+                                <div class="card-body">
+                                    <h6 class="card-title">Annual Gross Pay</h6>
+                                    <h3 class="mb-0">K {{ "{:,.2f}".format(data.annual_total_gross) }}</h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card bg-danger text-white">
+                                <div class="card-body">
+                                    <h6 class="card-title">Annual Deductions</h6>
+                                    <h3 class="mb-0">K {{ "{:,.2f}".format(data.annual_total_deductions) }}</h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card bg-primary text-white">
+                                <div class="card-body">
+                                    <h6 class="card-title">Annual Net Pay</h6>
+                                    <h3 class="mb-0">K {{ "{:,.2f}".format(data.annual_total_net) }}</h3>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Month</th>
+                                    <th class="text-end">Employees</th>
+                                    <th class="text-end">Gross Pay</th>
+                                    <th class="text-end">Deductions</th>
+                                    <th class="text-end">Net Pay</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for summary in data.monthly_summaries %}
+                                <tr>
+                                    <td>{{ summary.month }}</td>
+                                    <td class="text-end">{{ summary.employee_count }}</td>
+                                    <td class="text-end">K {{ "{:,.2f}".format(summary.total_gross) }}</td>
+                                    <td class="text-end">K {{ "{:,.2f}".format(summary.total_deductions) }}</td>
+                                    <td class="text-end">K {{ "{:,.2f}".format(summary.total_net) }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                            <tfoot>
+                                <tr class="table-primary">
+                                    <td><strong>Total</strong></td>
+                                    <td class="text-end"><strong>{{ data.monthly_summaries | sum(attribute='employee_count') }}</strong></td>
+                                    <td class="text-end"><strong>K {{ "{:,.2f}".format(data.annual_total_gross) }}</strong></td>
+                                    <td class="text-end"><strong>K {{ "{:,.2f}".format(data.annual_total_deductions) }}</strong></td>
+                                    <td class="text-end"><strong>K {{ "{:,.2f}".format(data.annual_total_net) }}</strong></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Email Report Modal -->
+<div class="modal fade" id="emailReportModal" tabindex="-1" aria-labelledby="emailReportModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="emailReportModalLabel">Email Report</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="{{ url_for('send_report_email_route', report_id=data.report_id) }}" method="POST">
+                <div class="modal-body">
+                    <p>Send {{ data.report_type }} report for {% if data.report_type == 'monthly' %}{{ data.current_month | month_name }} {% endif %}{{ data.current_year }}</p>
+                    <div class="mb-3">
+                        <label for="recipients" class="form-label">Recipients</label>
+                        <input type="text" class="form-control" id="recipients" name="recipients" placeholder="email1@example.com, email2@example.com" required>
+                        <small class="text-muted">Separate multiple email addresses with commas</small>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Send Email</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Payslip - {{ record.employee.name }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            color: #333;
+        }
+        .header {
+            margin-bottom: 30px;
+        }
+        .company-logo {
+            max-height: 80px;
+            margin-bottom: 10px;
+        }
+        .company-info {
+            float: left;
+            width: 60%;
+        }
+        .payslip-info {
+            float: right;
+            width: 40%;
+            text-align: right;
+        }
+        .clear {
+            clear: both;
+        }
+        .employee-info {
+            margin: 20px 0;
+            padding: 10px;
+            background-color: #f8f9fa;
+        }
+        .section {
+            margin: 20px 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        .amount {
+            text-align: right;
+        }
+        .total {
+            font-weight: bold;
+            background-color: #f8f9fa;
+        }
+        .earnings {
+            float: left;
+            width: 48%;
+        }
+        .deductions {
+            float: right;
+            width: 48%;
+        }
+        .net-pay {
+            clear: both;
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #007bff;
+            color: white;
+        }
+        .net-pay-amount {
+            float: right;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="company-info">
+            {% if company and company.logo %}
+            <img src="{{ url_for('static', filename=company.logo.replace('static/', ''), _external=True) }}" alt="Company Logo" class="company-logo">
+            {% endif %}
+            <h2>{{ company.name if company else 'Company Name' }}</h2>
+            <p>{{ company.address if company else 'Company Address' }}</p>
+            <p>Phone: {{ company.phone if company else 'Phone Number' }}</p>
+            <p>Email: {{ company.email if company else 'Email Address' }}</p>
+            <p>Registration #: {{ company.registration_number if company else 'Reg Number' }}</p>
+            <p>Tax #: {{ company.tax_number if company else 'Tax Number' }}</p>
+        </div>
+        <div class="payslip-info">
+            <h2>PAYSLIP</h2>
+            <p>For the month of {{ record.pay_date.strftime('%B %Y') }}</p>
+            <p>Pay Date: {{ record.pay_date.strftime('%Y-%m-%d') }}</p>
+        </div>
+        <div class="clear"></div>
+    </div>
+
+    <div class="employee-info">
+        <h3>Employee Details</h3>
+        <p>Name: {{ record.employee.name }}</p>
+        <p>Employee Code: {{ record.employee.employee_code }}</p>
+        <p>Position: {{ record.employee.position }}</p>
+        <p>Email: {{ record.employee.email }}</p>
+    </div>
+
+    <div class="section">
+        <div class="earnings">
+            <h3>Earnings</h3>
+            <table>
+                <tr>
+                    <td>Basic Salary</td>
+                    <td class="amount">K {{ "{:,.2f}".format(record.basic_salary) }}</td>
+                </tr>
+                <tr>
+                    <td>Housing Allowance</td>
+                    <td class="amount">K {{ "{:,.2f}".format(record.housing_allowance) }}</td>
+                </tr>
+                <tr>
+                    <td>Transport Allowance</td>
+                    <td class="amount">K {{ "{:,.2f}".format(record.transport_allowance) }}</td>
+                </tr>
+                <tr class="total">
+                    <td>Gross Pay</td>
+                    <td class="amount">K {{ "{:,.2f}".format(record.gross_pay) }}</td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="deductions">
+            <h3>Deductions</h3>
+            <table>
+                <tr>
+                    <td>PAYE</td>
+                    <td class="amount">K {{ "{:,.2f}".format(record.paye) }}</td>
+                </tr>
+                <tr>
+                    <td>NAPSA</td>
+                    <td class="amount">K {{ "{:,.2f}".format(record.napsa) }}</td>
+                </tr>
+                <tr>
+                    <td>NHIMA</td>
+                    <td class="amount">K {{ "{:,.2f}".format(record.nhima) }}</td>
+                </tr>
+                <tr>
+                    <td>Union Contribution</td>
+                    <td class="amount">K {{ "{:,.2f}".format(record.union_contribution) }}</td>
+                </tr>
+                <tr>
+                    <td>Worker's Compensation</td>
+                    <td class="amount">K {{ "{:,.2f}".format(record.workers_compensation) }}</td>
+                </tr>
+                <tr class="total">
+                    <td>Total Deductions</td>
+                    <td class="amount">K {{ "{:,.2f}".format(record.total_deductions) }}</td>
+                </tr>
+            </table>
+        </div>
+        <div class="clear"></div>
+    </div>
+
+    <div class="net-pay">
+        <span>Net Pay</span>
+        <span class="net-pay-amount">K {{ "{:,.2f}".format(record.net_pay) }}</span>
+    </div>
+</body>
+</html>

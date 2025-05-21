@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Payrun Verification</h4>
+                </div>
+                <div class="card-body">
+                    <p class="lead">Generate a verification report to review employee data before processing payroll.</p>
+                    <p>This report will include:</p>
+                    <ul>
+                        <li>All active employees with their current salary and allowance information</li>
+                        <li>Calculated deductions (PAYE, NAPSA, NHIMA)</li>
+                        <li>Gross and net pay calculations</li>
+                        <li>Total amounts for all categories</li>
+                    </ul>
+                    <p class="text-muted">Use this report to verify all employee data is correct before finalizing the payroll process.</p>
+                    
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i> This report will only include active employees and their current data.
+                    </div>
+                    
+                    <form method="POST" class="mt-4">
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-file-pdf me-2"></i> Generate Verification Report
+                            </button>
+                            <a href="{{ url_for('process_payroll', skip='true') }}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-right me-2"></i> Skip to Payroll Processing
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="card shadow-sm">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">Recent Verification Reports</h5>
+                </div>
+                <div class="card-body">
+                    {% set verification_reports = reports|selectattr('type', 'equalto', 'verification')|list %}
+                    {% if verification_reports %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Report Name</th>
+                                        <th>Generated</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for report in verification_reports|sort(attribute='generated_at', reverse=True) %}
+                                    <tr>
+                                        <td>{{ report.name }}</td>
+                                        <td>{{ report.generated_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                                        <td>
+                                            <div class="btn-group btn-group-sm">
+                                                <a href="{{ url_for('view_report', id=report.id) }}" class="btn btn-outline-primary">
+                                                    <i class="fas fa-eye"></i> View
+                                                </a>
+                                                <a href="{{ url_for('static', filename=report.file_path) }}" download class="btn btn-outline-success">
+                                                    <i class="fas fa-download"></i> Download
+                                                </a>
+                                                <a href="{{ url_for('delete_report', id=report.id) }}" class="btn btn-outline-danger" onclick="return confirm('Are you sure you want to delete this report?');">
+                                                    <i class="fas fa-trash"></i> Delete
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-light text-center">
+                            <i class="fas fa-file-alt fa-2x mb-3"></i>
+                            <p>No verification reports have been generated yet.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payroll System</title>
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Allura&display=swap" rel="stylesheet">
+    <!-- Custom CSS -->
+    <style>
+        .bg-gradient-primary {
+            background: linear-gradient(87deg, #5e72e4 0, #825ee4 100%);
+        }
+        .bg-gradient-success {
+            background: linear-gradient(87deg, #2dce89 0, #2dcecc 100%);
+        }
+        .bg-gradient-warning {
+            background: linear-gradient(87deg, #fb6340 0, #fbb140 100%);
+        }
+        .bg-gradient-info {
+            background: linear-gradient(87deg, #11cdef 0, #1171ef 100%);
+        }
+        .bg-gradient-danger {
+            background: linear-gradient(87deg, #f5365c 0, #f56036 100%);
+        }
+        .icon-shape {
+            width: 48px;
+            height: 48px;
+            line-height: 48px;
+            text-align: center;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .icon-shape i {
+            color: #fff;
+            font-size: 1.25rem;
+        }
+        .shadow-primary {
+            box-shadow: 0 4px 20px 0 rgba(0,0,0,.14), 0 7px 10px -5px rgba(94,114,228,.4);
+        }
+        .shadow-success {
+            box-shadow: 0 4px 20px 0 rgba(0,0,0,.14), 0 7px 10px -5px rgba(45,206,137,.4);
+        }
+        .shadow-warning {
+            box-shadow: 0 4px 20px 0 rgba(0,0,0,.14), 0 7px 10px -5px rgba(251,99,64,.4);
+        }
+        .shadow-info {
+            box-shadow: 0 4px 20px 0 rgba(0,0,0,.14), 0 7px 10px -5px rgba(17,205,239,.4);
+        }
+        .shadow-danger {
+            box-shadow: 0 4px 20px 0 rgba(0,0,0,.14), 0 7px 10px -5px rgba(245,54,92,.4);
+        }
+        .card {
+            box-shadow: 0 0 2rem 0 rgba(136,152,170,.15);
+            border: 0;
+        }
+        .numbers {
+            font-weight: 600;
+        }
+        .numbers .card-title {
+            text-transform: uppercase;
+            font-size: .875rem;
+            font-weight: 600;
+        }
+        .numbers h5 {
+            font-size: 1.5rem;
+            line-height: 1.2;
+            font-weight: 600;
+        }
+        .table thead th {
+            font-size: .65rem;
+            padding-top: .75rem;
+            padding-bottom: .75rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            border-bottom: 1px solid #e9ecef;
+        }
+        .navbar {
+            box-shadow: 0 0 2rem 0 rgba(136,152,170,.15);
+        }
+        .fc .fc-toolbar-title {
+            font-size: 1.2rem;
+        }
+        .fc .fc-button {
+            padding: .25rem .5rem;
+            font-size: .875rem;
+        }
+        /* Sticky footer styles */
+        html {
+            position: relative;
+            min-height: 100%;
+        }
+        body {
+            margin-bottom: 80px; /* Margin bottom by footer height */
+        }
+        .footer {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 80px; /* Increased height to accommodate two lines of text */
+            padding-top: 10px; /* Added padding to center content vertically */
+            background-color: #f5f5f5;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    {% if request.endpoint != 'index' %}
+    <nav class="navbar navbar-expand-lg navbar-dark bg-gradient-primary mb-4">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{{ url_for('dashboard') }}">
+                <i class="fas fa-money-check-alt me-2"></i>PyCheq
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <!-- Main Navigation -->
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint == 'dashboard' %}active{% endif %}" href="{{ url_for('dashboard') }}">
+                            <i class="fas fa-home"></i> Dashboard
+                        </a>
+                    </li>
+                    <!-- Employee Management Dropdown -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="employeeDropdown" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-users"></i> Employees
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a class="dropdown-item" href="{{ url_for('add_employee') }}">
+                                    <i class="fas fa-user-plus"></i> Add Employee
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="{{ url_for('employees') }}">
+                                    <i class="fas fa-user-friends"></i> View All
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                    <!-- Payroll Management Dropdown -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="payrollDropdown" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-money-check-alt"></i> Payroll
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a class="dropdown-item" href="{{ url_for('process_payroll') }}">
+                                    <i class="fas fa-calculator"></i> Process Payroll
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="{{ url_for('payroll_records') }}">
+                                    <i class="fas fa-file-invoice-dollar"></i> Records
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <a class="dropdown-item" href="{{ url_for('payroll_reports') }}">
+                                    <i class="fas fa-chart-bar"></i> Reports
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+                <!-- Right Side Navigation -->
+                <ul class="navbar-nav ms-auto">
+                    <!-- Settings Dropdown -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="settingsDropdown" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-cog"></i> Settings
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li>
+                                <a class="dropdown-item" href="{{ url_for('company_settings') }}">
+                                    <i class="fas fa-building"></i> Company
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="{{ url_for('tax_settings') }}">
+                                    <i class="fas fa-percent"></i> Tax Settings
+                                </a>
+                            </li>
+                            {% if current_user.is_admin %}
+                            <li>
+                                <a class="dropdown-item" href="{{ url_for('license.licenses') }}">
+                                    <i class="fas fa-key"></i> License Management
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="{{ url_for('email_settings') }}">
+                                    <i class="fas fa-envelope"></i> Email Settings
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="{{ url_for('settings') }}">
+                                    <i class="fas fa-database"></i> System Settings
+                                </a>
+                            </li>
+                            {% endif %}
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <a class="dropdown-item" href="{{ url_for('profile') }}">
+                                    <i class="fas fa-user-circle"></i> Profile
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                    {% if current_user.is_authenticated %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('logout') }}">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+    {% else %}
+    <!-- Centered logo for landing page -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-gradient-primary mb-4">
+        <div class="container-fluid d-flex justify-content-center">
+            <a class="navbar-brand" href="{{ url_for('dashboard') }}">
+                <i class="fas fa-money-check-alt fa-2x"></i>
+            </a>
+        </div>
+    </nav>
+    {% endif %}
+
+    <!-- Flash Messages -->
+    <div class="container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <!-- Main Content -->
+    {% block content %}{% endblock %}
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container text-center">
+            <span class="text-muted">By <span style="font-family: 'Allura', cursive; font-size: 1.5em;">Tommysoft</span></span><br>
+            <small class="text-muted">&copy; 2025</small>
+        </div>
+    </footer>
+
+    <!-- jQuery first, then Bootstrap JS Bundle with Popper -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Custom Scripts -->
+    {% block scripts %}{% endblock %}
+</body>
+</html>

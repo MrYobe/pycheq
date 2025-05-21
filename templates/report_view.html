@@ -1,0 +1,201 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ report.name }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1>{{ report.name }}</h1>
+            <p class="text-muted">Generated on: {{ report.generated_at.strftime('%Y-%m-%d %H:%M') }}</p>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="{{ url_for('download_report', id=report.id, download='true') }}" class="btn btn-primary">
+                <i class="fas fa-download"></i> Download PDF
+            </a>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <h3 class="card-title mb-0">
+                {% if report_type == 'monthly' %}
+                    Monthly Payroll Report - {{ month_name }} {{ year }}
+                {% else %}
+                    Annual Payroll Report - {{ year }}
+                {% endif %}
+            </h3>
+        </div>
+        <div class="card-body">
+            {% if report_type == 'monthly' %}
+                <!-- Monthly Report Summary -->
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header bg-light">Summary</div>
+                            <div class="card-body">
+                                <table class="table table-bordered">
+                                    <tbody>
+                                        <tr>
+                                            <th>Total Basic Salary</th>
+                                            <td class="text-end">K {{ summary.total_basic_salary|format_currency }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Total Housing Allowance</th>
+                                            <td class="text-end">K {{ summary.total_housing_allowance|format_currency }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Total Lunch Allowance</th>
+                                            <td class="text-end">K {{ summary.total_lunch_allowance|format_currency }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Total Transport Allowance</th>
+                                            <td class="text-end">K {{ summary.total_transport_allowance|format_currency }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Total Overtime</th>
+                                            <td class="text-end">K {{ summary.total_overtime|format_currency }}</td>
+                                        </tr>
+                                        <tr class="table-primary">
+                                            <th>Total Gross Pay</th>
+                                            <td class="text-end">K {{ summary.total_gross_pay|format_currency }}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header bg-light">Deductions & Net Pay</div>
+                            <div class="card-body">
+                                <table class="table table-bordered">
+                                    <tbody>
+                                        <tr>
+                                            <th>Total PAYE</th>
+                                            <td class="text-end">K {{ summary.total_paye|format_currency }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Total NAPSA</th>
+                                            <td class="text-end">K {{ summary.total_napsa|format_currency }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Total NHIMA</th>
+                                            <td class="text-end">K {{ summary.total_nhima|format_currency }}</td>
+                                        </tr>
+                                        <tr class="table-danger">
+                                            <th>Total Deductions</th>
+                                            <td class="text-end">K {{ summary.total_deductions|format_currency }}</td>
+                                        </tr>
+                                        <tr class="table-success">
+                                            <th>Total Net Pay</th>
+                                            <td class="text-end">K {{ summary.total_net_pay|format_currency }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Employee Count</th>
+                                            <td class="text-end">{{ summary.employee_count }}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Employee Details -->
+                <h4 class="mb-3">Employee Details</h4>
+                <div class="table-responsive">
+                    <table class="table table-striped table-bordered">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Employee</th>
+                                <th>Basic Salary</th>
+                                <th>Allowances</th>
+                                <th>Gross Pay</th>
+                                <th>PAYE</th>
+                                <th>NAPSA</th>
+                                <th>NHIMA</th>
+                                <th>Total Deductions</th>
+                                <th>Net Pay</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for employee in employees %}
+                            <tr>
+                                <td>{{ employee.name }}</td>
+                                <td class="text-end">K {{ employee.basic_salary|format_currency }}</td>
+                                <td class="text-end">K {{ (employee.housing_allowance + employee.lunch_allowance + employee.transport_allowance)|format_currency }}</td>
+                                <td class="text-end">K {{ employee.gross_pay|format_currency }}</td>
+                                <td class="text-end">K {{ employee.paye|format_currency }}</td>
+                                <td class="text-end">K {{ employee.napsa|format_currency }}</td>
+                                <td class="text-end">K {{ employee.nhima|format_currency }}</td>
+                                <td class="text-end">K {{ employee.total_deductions|format_currency }}</td>
+                                <td class="text-end">K {{ employee.net_pay|format_currency }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <!-- Annual Report Summary -->
+                <div class="row mb-4">
+                    <div class="col-md-6 offset-md-3">
+                        <div class="card">
+                            <div class="card-header bg-light">Annual Summary - {{ year }}</div>
+                            <div class="card-body">
+                                <table class="table table-bordered">
+                                    <tbody>
+                                        <tr>
+                                            <th>Total Gross Pay</th>
+                                            <td class="text-end">K {{ annual_summary.total_gross_pay|format_currency }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Total Deductions</th>
+                                            <td class="text-end">K {{ annual_summary.total_deductions|format_currency }}</td>
+                                        </tr>
+                                        <tr class="table-success">
+                                            <th>Total Net Pay</th>
+                                            <td class="text-end">K {{ annual_summary.total_net_pay|format_currency }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Total Employees</th>
+                                            <td class="text-end">{{ annual_summary.employee_count }}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Monthly Breakdown -->
+                <h4 class="mb-3">Monthly Breakdown</h4>
+                <div class="table-responsive">
+                    <table class="table table-striped table-bordered">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Month</th>
+                                <th>Gross Pay</th>
+                                <th>Deductions</th>
+                                <th>Net Pay</th>
+                                <th>Employees</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for month in monthly_summary %}
+                            <tr>
+                                <td>{{ month.month }}</td>
+                                <td class="text-end">K {{ month.gross_pay|format_currency }}</td>
+                                <td class="text-end">K {{ month.deductions|format_currency }}</td>
+                                <td class="text-end">K {{ month.net_pay|format_currency }}</td>
+                                <td class="text-center">{{ month.employee_count }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
