@@ -1,7 +1,31 @@
+# Core Flask and Extensions
 Flask==2.3.3
 Flask-SQLAlchemy==3.1.1
 Flask-Login==0.6.2
 Flask-WTF==1.1.1
+Flask-Mail==0.9.1
+Flask-Migrate==4.0.5
 Werkzeug==2.3.7
-python-dotenv==1.0.0
+gunicorn==21.2.0
+
+# Database
+SQLAlchemy==2.0.23
+
+# PDF Generation
+reportlab==4.0.9
+
+# Data Processing
+pandas==2.1.3
+numpy==1.26.2
+
+# Email and Validation
 email-validator==2.0.0
+python-dotenv==1.0.0
+
+# Security
+cryptography==41.0.5
+
+# Utilities
+python-dateutil==2.8.2
+Pillow==10.1.0  # For image processing
+openpyxl==3.1.2  # For Excel file handling
