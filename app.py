@@ -36,7 +36,9 @@ import socket
 import csv
 import io
 
-app = Flask(__name__)
+app = Flask(__name__, 
+    static_folder='static',
+    template_folder='templates')
 app.config['SECRET_KEY'] = os.urandom(24)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///payroll.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -3526,7 +3528,7 @@ if __name__ == '__main__':
             db.session.add(tax_settings)
             db.session.commit()
             
-    app.run()
+    app.run(debug=True, host='0.0.0.0', port=5000)
 
 
 
